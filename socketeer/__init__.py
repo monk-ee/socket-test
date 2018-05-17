@@ -38,7 +38,7 @@ class Socketeer:
         :return:
         """
         logger.info("Socketeer: I am in server mode.")
-        self._sock.bind((server_name, port))
+        self._sock.bind((server_name, int(port)))
         self._sock.listen(1)
 
         while True:
@@ -66,7 +66,7 @@ class Socketeer:
         :return:
         """
         logger.info("Socketeer: I am in client mode.")
-        self._sock.connect((server_name, port))
+        self._sock.connect((server_name, int(port)))
         message = 'This is your captain speaking, network turbulence expected'
         logger.info("Sending: %s" % message)
         while True:
