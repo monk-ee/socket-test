@@ -1,6 +1,8 @@
 """socket testing utility"""
 import logging
 from pymongo import MongoClient
+from pymongo.errors import  ConnectionFailure
+import sys
 import time
 
 # pylint: disable=locally-disabled, invalid-name
@@ -26,8 +28,12 @@ class Mongobeer:
         default to server
         """
         # Create a TCP/IP socket
-        self._client = MongoClient(args.connection_string, maxPoolSize=1)
+        try:
+            self._client = MongoClient(args.connection_string, maxPoolSize=1)
+        except ConnectionFailure as conn_error:
+            logger.info("Conection error: {}".format(conn_error))
 
+        self._mongobeer_one(args.collection)
 
     def _mongobeer_one(self, collection):
         """
@@ -35,9 +41,10 @@ class Mongobeer:
         :return:
         """
         logger.info("mongobeer: I am in client mode.")
-        collection = self._client[collection]
+        db = self._client[collection]
         while True:
-            collection.find_one()
+            db.collection.find_one()
+            logger.info("find one")
             time.sleep(5)
 
 
