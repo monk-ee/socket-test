@@ -1,12 +1,12 @@
 # Socketeer
 
-##Virtualenv
+#Virtualenv
 
 virtualenv -p python3 env
 
 source env/bin/activate
 
-./run.py -m <client|server> -p <port number>
+./run.py -m <client|server> -p <port number> -s <server_name> 
 
 
 #Fun and profit
