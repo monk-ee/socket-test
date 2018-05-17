@@ -45,9 +45,13 @@ class Socketeer:
             logger.info('Waiting for a connection')
             connection, client_address = self._sock.accept()
             try:
-                logger.info('client connected: %s' % client_address)
+                logger.info("Client connected:{}".format(client_address))
                 while True:
-                    data = connection.recv(16)
+                    try:
+                        data = connection.recv(16)
+                    except ConnectionResetError as connection_error:
+                        logger.debug("The network hates me {}!".format(connection_error))
+                        connection, client_address = self._sock.accept()
                     logger.info('Received "%s"' % data)
                     if data:
                         connection.sendall(data)
@@ -63,19 +67,20 @@ class Socketeer:
         """
         logger.info("Socketeer: I am in client mode.")
         self._sock.connect((server_name, port))
-        try:
-
-            message = 'This is your captain speaking, network turbulence expected'
-            logger.info("Sending: %s" % message)
-            self._sock.sendall(message)
-            amount_received = 0
-            amount_expected = len(message)
-            while amount_received < amount_expected:
-                data = self._sock.recv(16)
-                amount_received += len(data)
-                logger.info("Received: %s" % data)
-        finally:
-            self._sock.close()
+        message = 'This is your captain speaking, network turbulence expected'
+        logger.info("Sending: %s" % message)
+        while True:
+            try:
+                self._sock.sendall(message.encode('utf-8'))
+                amount_received = 0
+                amount_expected = len(message)
+                while amount_received < amount_expected:
+                    data = self._sock.recv(16)
+                    amount_received += len(data)
+                    logger.info("Received: %s" % data)
+            except:
+                logger.debug("Something went boom!")
+        self._sock.close()
 
 
 if __name__ == "__main__":
